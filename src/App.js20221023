@@ -3,11 +3,11 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  let [title, setTItle] = useState(['남자 코트 추천', '강남 맛집 추천', '파이썬 독학']);
-  let [like, setLike] = useState(0);
-  let [modal, setModal] = useState(false);
-  let [titleIdx, setTitleIdx] = useState(0);
-  
+  let [listData, setListData] = useState([
+    {title:'남자 코트 추천', like:0, modal:false},
+    {title:'강남 우동맛집', like:0, modal:false},
+    {title:'파이썬독학', like:0,  modal:false}]);
+
   return (
     <div className="App">
       <div className="black-nav">
@@ -42,27 +42,32 @@ function App() {
 
 
       {
-        title.map(function(d, i){
+        listData.map(function(d, i){
           return (
             <>
               <div className="list" key={"list"+i}>
                 <h4 onClick={() => {
-                  setModal(!modal);
-                  setTitleIdx(i);
-                }}>{ title[i] }
+                  let copyListData = [...listData]
+                  copyListData[i]['modal'] = !copyListData[i]['modal'];
+                  setListData(copyListData); 
+                }}>{ d['title'] }
                 <span onClick={() => {
-                  setLike(like+1)
-                }}>👍</span>{ like }</h4>
+                  let copyListData = [...listData]  
+                  copyListData[i]['like'] += 1;
+                  setListData(copyListData); 
+                }}>👍</span>{ d['like'] }</h4>
                 <p>2월 17일 발행</p>
               </div>
+              
+              {
+                listData[i]['modal'] == true ? <Modal listData={ listData } setListData={ setListData } idx={ i }/> : null
+              }
             </>
           )
         })
       }
+
       
-      {
-        modal == true ? <Modal title={ title } titleIdx={ titleIdx }/> : null
-      }
     </div>
   );
 }
@@ -70,10 +75,14 @@ function App() {
 const Modal = (props) => {
   return (
     <div className="modal">
-      <h4>{ props.title[props.titleIdx] }</h4>
+      <h4>{ props.listData[props.idx]['title'] }</h4>
       <p>날짜</p>
       <p>상세내용</p>
-      <button>글수정</button>
+      <button onClick={() => {
+        let copyListData = [...props.listData] 
+        copyListData[props.idx]['title'] = '여자 코트 추천';
+        props.setListData(copyListData)
+      }}>글수정</button>
     </div>
   );
 }
